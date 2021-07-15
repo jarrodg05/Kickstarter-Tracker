@@ -1,7 +1,5 @@
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'dart:convert';
-
 class Project
 {
 	Widget image;
@@ -19,12 +17,16 @@ class Project
 		required this.link,
 	});
 	
-	fromJson( Map<String, dynamic> json )
+	static fromJson( Map<String, dynamic> json )
 	{
-		name = json['name'];
-		publisher = json['publisher'];
-		link = json['link'];
-		date = json['date'];
+		return Project
+		(
+			image: Container( decoration: const BoxDecoration( color: Colors.blue ), ),
+			name: json['name'],
+			publisher: json['publisher'],
+			link: json['link'],
+			date: DateTime.parse( json['date'] ),
+		);
 	}
 	
 	Map<String, dynamic> toJson() =>
@@ -32,52 +34,76 @@ class Project
 		'name': name,
 		'publisher': publisher,
 		'link': link,
-		'date': date,
+		'date': date.toString(),
 	};
 }
 
 class ProjectsDatabase
 {
+	//////////////////////////////////////////////////
+	//                 CONSTRUCTORS
+	//////////////////////////////////////////////////
 	ProjectsDatabase._privateConstructor()
 	{
-		_projects.add( Project
-		(
-			publisher: 'Game Brewer',
-			date: new DateTime( 2021, DateTime.september ),
-			image: Container
-			(
-				decoration: const BoxDecoration( color: Colors.blue ),
-			),
-			name: 'Stroganov',
-			link: 'https://www.kickstarter.com/projects/gamebrewer/stroganov',
-		) );
-		
-		_projects.add( Project
-		(
-			publisher: 'Travis',
-			date: new DateTime( 2021, DateTime.november ),
-			image: Container
-			(
-				decoration: const BoxDecoration( color: Colors.yellow),
-			),
-			name: 'Aeons End',
-			link: 'https://www.kickstarter.com/projects/ibcgames/aeons-end-legacy-of-gravehold',
-		) );
+		loadProjects( null );
 	}
 	
+	///////////////////////////////////////////////////////////
+	//                  STATIC VARIABLES
+	///////////////////////////////////////////////////////////
 	static final ProjectsDatabase database = ProjectsDatabase._privateConstructor();
 	
+	///////////////////////////////////////////////////////////
+	//                   INSTANCE VARIABLES
+	///////////////////////////////////////////////////////////
 	List<Project> _projects = [];
+	final _projectFirebase = FirebaseFirestore.instance.collection( 'projects' )
+		.withConverter<Project>
+		(
+			fromFirestore: ( snapshot, _ ) => Project.fromJson( snapshot.data()! ), 
+			toFirestore: ( project, _ ) => project.toJson(),
+		);
 	
-	
+	bool upToDate = false;
+	///////////////////////////////////////////////////////////
+	//                INSTANCE METHODS
+	///////////////////////////////////////////////////////////
 	List<Project> getProjects()
 	{
-		print(_projects.length);
 		return _projects;
 	}
 	
-	void addProject( Project project )
+	bool checkProjects( void Function() reload )
 	{
-		_projects.add( project );
+		if( !upToDate )
+		{
+			loadProjects( reload );
+			return false;
+		}
+		return true;
+	}
+	
+	void addProject( Project project ) async
+	{
+		upToDate = false;
+		await _projectFirebase.add( project );
+		loadProjects( null );
+	}
+	
+	void loadProjects( void Function()? reload ) async
+	{
+		// TODO there is almost certainly a better way to do this
+		await _projectFirebase
+			.get()
+			.then( (snapshot) {
+				List<QueryDocumentSnapshot<Project>> projects = snapshot.docs;
+				_projects = projects.map( (snapshot) => snapshot.data() ).toList();
+				upToDate = true;
+			
+				if( reload != null )
+				{
+					reload.call();
+				}
+			});
 	}
 }

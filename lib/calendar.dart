@@ -123,7 +123,6 @@ class _ProjectDescription extends StatelessWidget
 List<ProjectListItem> getProjects()
 {
 	List<Project> projects = ProjectsDatabase.database.getProjects();
-	print(projects.length);
 	List<ProjectListItem> projectsList = [];
 	
 	// create a list item for each project
@@ -140,7 +139,6 @@ List<ProjectListItem> getProjects()
 	}
 	
 	projectsList.sort( (a,b) => a.date.compareTo(b.date) );
-	print(projectsList.length);
 	return projectsList;
 }
 
@@ -169,6 +167,7 @@ class CalendarPage extends State<Calendar>
 	late Widget _calendar;
 	static late final CalendarPage instance;
 	late ListView projectList;
+	bool loading = true;
 	
 	CalendarPage()
 	{
@@ -181,8 +180,24 @@ class CalendarPage extends State<Calendar>
 		return _calendar;
 	}
 	
+	void reload()
+	{
+		setState(() 
+		{
+			loading = false;
+			projectList = projectListView();
+		});
+	}
+	
 	Widget build( BuildContext context )
 	{
+		ProjectsDatabase.database.checkProjects( reload );
+
+		if( loading )
+		{
+			return Text( "Loading" );
+		}
+		
 		Container projects = Container
 		(
 			height: 244.0,
@@ -212,6 +227,7 @@ class CalendarPage extends State<Calendar>
 	void addProject( BuildContext context ) async
 	{
 		await Navigator.pushNamed( context, '/addProject' );
+		// ProjectsDatabase.database.checkProjects();
 		setState( () 
 		{
 			projectList = projectListView();

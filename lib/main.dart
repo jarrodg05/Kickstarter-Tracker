@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'calendar.dart';
 import 'addProject.dart';
 
@@ -56,9 +57,48 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> 
 {
+	bool _initialized = false;
+	bool _error = false;
+	
+	void initializeFirebase() async
+	{
+		try
+		{
+			await Firebase.initializeApp();
+			setState( () 
+			{
+				_initialized = true;
+			} );
+		}
+		catch( e )
+		{
+			setState( () 
+			{
+				_error = true;
+			});
+		}
+	}
+	
+	@override
+	void initState()
+	{
+		initializeFirebase();
+		super.initState();
+	}
+	
 	@override
 	Widget build( BuildContext context )
 	{
+		if( _error )
+		{
+			// return error screen
+		}
+		
+		if( !_initialized )
+		{
+			// return loading screen
+		}
+	
 		return Calendar();
 	}
 	
