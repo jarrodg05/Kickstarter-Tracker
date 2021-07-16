@@ -41,7 +41,7 @@ class _AddProjectScreenState extends State<AddProjectScreen>
 		(
 			children:
 			[
-				TextField( controller: _name, ),
+				Row( children: [Text('Name'), SizedBox(child: TextField( controller: _name,),width: 400,)]),
 				TextField( controller: _publisher ),
 				TextField( controller: _link, ),
 				TextButton( onPressed: () {selectDate(context);}, child: _dateText ),

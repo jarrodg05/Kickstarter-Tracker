@@ -3,6 +3,7 @@ import 'package:flutter_web_browser/flutter_web_browser.dart';
 import 'package:kickstarter/projects.dart';
 
 import 'projects.dart';
+import 'date.dart';
 
 class ProjectListItem extends StatelessWidget
 {
@@ -91,6 +92,7 @@ class _ProjectDescription extends StatelessWidget
 				crossAxisAlignment: CrossAxisAlignment.start,
 				children: <Widget>
 				[
+					const Padding( padding: EdgeInsets.symmetric(vertical: 1.0)),
 					Text
 					(
 						title,
@@ -111,9 +113,15 @@ class _ProjectDescription extends StatelessWidget
 					const Padding( padding: EdgeInsets.symmetric(vertical: 1.0)),
 					Text
 					(
-						'Arrives: $releaseDate',
+						'Arrives: ' + prettyPrint( releaseDate ),
 						style: const TextStyle( fontSize: 10.0 ),
 					),
+					
+					const Padding( padding: EdgeInsets.symmetric(vertical: 1.0)),
+					Divider
+					( 
+						color: Colors.blue,
+					)
 				],
 			),
 		);
