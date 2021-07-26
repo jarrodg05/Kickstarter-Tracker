@@ -7,20 +7,12 @@ import 'date.dart';
 
 class ProjectListItem extends StatelessWidget
 {
-	final Widget image;
-	final String name;
-	final String publisher;
-	final DateTime date;
-	final String link;
+	final Project project;
 
 	const ProjectListItem(
 	{
 		Key? key,
-		required this.image,
-		required this.name,
-		required this.publisher,
-		required this.date,
-		required this.link,
+		required this.project,
 	}) : super( key: key );
 
 	@override
@@ -33,14 +25,14 @@ class ProjectListItem extends StatelessWidget
 				crossAxisAlignment: CrossAxisAlignment.start,
 				children: <Widget>[
 					Expanded(
-						child: image,
+						child: project.image,
 						flex: 2
 					),
 					Expanded(
 						child: _ProjectDescription(
-							title: name,
-							publisher: publisher,
-							releaseDate: date, 
+							title: project.name,
+							publisher: project.publisher,
+							releaseDate: project.date, 
 							),
 						flex: 3,
 					),
@@ -55,10 +47,15 @@ class ProjectListItem extends StatelessWidget
 		return new GestureDetector(
 			onTap: ()
 			{
-				openBrowser( this.link );
+				showMore( this.project, context );
 			},
 			child: padding,
 		);
+	}
+	
+	showMore( Project project, BuildContext context ) async
+	{
+		await Navigator.pushNamed( context, '/showMore', arguments: project );
 	}
 }
 
@@ -138,15 +135,11 @@ List<ProjectListItem> getProjects()
 	{
 		projectsList.add( ProjectListItem
 		( 
-			image: project.image,
-			name: project.name,
-			publisher: project.publisher,
-			date: project.date,
-			link: project.link
+			project: project,
 		) );
 	}
 	
-	projectsList.sort( (a,b) => a.date.compareTo(b.date) );
+	projectsList.sort( (a,b) => a.project.date.compareTo(b.project.date) );
 	return projectsList;
 }
 

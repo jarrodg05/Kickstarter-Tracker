@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'projects.dart';
+import 'date.dart';
 
 class AddProjectScreen extends StatefulWidget
 {
@@ -41,10 +42,77 @@ class _AddProjectScreenState extends State<AddProjectScreen>
 		(
 			children:
 			[
-				Row( children: [Text('Name'), SizedBox(child: TextField( controller: _name,),width: 400,)]),
-				TextField( controller: _publisher ),
-				TextField( controller: _link, ),
+				nameField(),
+				Padding( padding: EdgeInsets.symmetric(vertical: 10) ),
+				publisherField(),
+				Padding( padding: EdgeInsets.symmetric(vertical: 10) ),
+				linkField(),
+				Padding( padding: EdgeInsets.symmetric(vertical: 10) ),
+				dateField(),
+				Padding( padding: EdgeInsets.symmetric(vertical: 10) ),
+				confirmField(),
+			],
+		);
+	}
+	
+	Widget nameField()
+	{
+		return Row
+		(
+			children: 
+			[
+				Text( 'Name: ' ),
+				Padding( padding: EdgeInsets.only(left: 20) ),
+				SizedBox( child: TextField(controller: _name,), width: 400, ),
+			],
+		);
+	}
+	
+	Widget publisherField()
+	{
+		return Row
+		(
+			children: 
+			[
+				Text( 'Publisher: ' ),
+				Padding( padding: EdgeInsets.only(left: 20) ),
+				SizedBox( child: TextField(controller: _publisher,), width: 400, ),
+			],
+		);
+	}
+		
+	Widget linkField()
+	{
+		return Row
+		(
+			children: 
+			[
+				Text( 'Link: ' ),
+				Padding( padding: EdgeInsets.only(left: 20) ),
+				SizedBox( child: TextField(controller: _link,), width: 400, ),
+			],
+		);
+	}
+	
+	Widget dateField()
+	{
+		return Row
+		(
+			children: 
+			[
+				Text( 'Arrival Date: ' ),
 				TextButton( onPressed: () {selectDate(context);}, child: _dateText ),
+			],
+		);
+	}
+	
+	Widget confirmField()
+	{
+		return Row
+		(
+			children: 
+			[
+				Text( 'Add to Tracker: ' ),
 				IconButton( onPressed: () {addProject();}, icon: Icon(Icons.add_task) )
 			],
 		);
@@ -59,10 +127,9 @@ class _AddProjectScreenState extends State<AddProjectScreen>
 			firstDate: _currentDate,
 			lastDate: _currentDate.add( Duration(days: 5*365) ),
 			initialDatePickerMode: DatePickerMode.year,
-			
 		);
 		
-		String dateString = _date!.month.toString() + _date!.year.toString() ;
+		String dateString = prettyPrint( _date! );
 		_dateText = Text( dateString );
 		setState(() {
 			return;
@@ -86,7 +153,8 @@ class _AddProjectScreenState extends State<AddProjectScreen>
 			name: name,
 			publisher: publisher,
 			date: date,
-			link: link
+			link: link,
+			status: ProjectStatus.Campaign,
 		);
 		
 		ProjectsDatabase.database.addProject( project );

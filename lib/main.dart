@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:kickstarter/addPledge.dart';
+import 'package:kickstarter/showMore.dart';
 import 'calendar.dart';
 import 'addProject.dart';
 
@@ -32,6 +34,8 @@ class MyApp extends StatelessWidget {
 			{
 				'/calendar': (context) => Calendar(),
 				'/addProject': (context) => AddProjectScreen(),
+				'/showMore': (context) => ShowMoreScreen(),
+				'/addPledge': (context) => AddPledgeScreen(),
 			},
 		);
 	}

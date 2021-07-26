@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+
+import 'pledge.dart';
 class Project
 {
 	Widget image;
@@ -7,6 +9,8 @@ class Project
 	String publisher;
 	DateTime date;
 	String link;
+	Pledges pledges;
+	ProjectStatus status;
 
 	Project(
 	{
@@ -15,18 +19,39 @@ class Project
 		required this.publisher,
 		required this.date,
 		required this.link,
-	});
+		required this.status,
+		pledges,
+	}) : this.pledges = pledges ?? [];
 	
 	static fromJson( Map<String, dynamic> json )
 	{
-		return Project
-		(
-			image: Container( decoration: const BoxDecoration( color: Colors.blue ), ),
-			name: json['name'],
-			publisher: json['publisher'],
-			link: json['link'],
-			date: DateTime.parse( json['date'] ),
-		);
+		try
+		{
+			return Project
+			(
+				image: Container( decoration: const BoxDecoration( color: Colors.blue ), ),
+				name: json['name'],
+				publisher: json['publisher'],
+				link: json['link'],
+				date: DateTime.parse( json['date'] ),
+				pledges: Pledges.parse( json['pledges'] ),
+				status: json['status'],
+			);
+		}
+		catch( e )
+		{
+			// might be earlier version - pre status and pledges
+			return Project
+			(
+				image: Container( decoration: const BoxDecoration( color: Colors.blue ), ),
+				name: json['name'],
+				publisher: json['publisher'],
+				link: json['link'],
+				date: DateTime.parse( json['date'] ),
+				pledges: new Pledges( null ),
+				status: ProjectStatus.Campaign,
+			);
+		}
 	}
 	
 	Map<String, dynamic> toJson() =>
@@ -35,7 +60,19 @@ class Project
 		'publisher': publisher,
 		'link': link,
 		'date': date.toString(),
+		'pledges': pledges.toString(),
+		'status': status.index,
 	};
+}
+
+enum ProjectStatus
+{
+	PreLaunch,
+	Campaign,
+	Successful,
+	LatePledge,
+	Production,
+	Shipping,
 }
 
 class ProjectsDatabase
