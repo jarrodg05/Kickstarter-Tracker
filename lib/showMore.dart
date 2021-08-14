@@ -86,7 +86,7 @@ class ShowMoreState extends State
 					(
 						onPressed: ()
 						{
-							Navigator.pushNamed( context, '/addPledge' );
+							Navigator.pushNamed( context, '/addPledge', arguments: this.project );
 						},
 						icon: Icon( Icons.add ),
 					),

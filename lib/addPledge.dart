@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kickstarter/pledge.dart';
+import 'package:kickstarter/projects.dart';
 
 class AddPledgeScreen extends StatefulWidget
 {
@@ -12,6 +13,9 @@ class AddPledgeScreen extends StatefulWidget
 
 class AddPledgeState extends State
 {
+	late Project project;
+	late BuildContext context;
+	
 	TextEditingController _name = TextEditingController();
 	TextEditingController _description = TextEditingController();
 	TextEditingController _amount = TextEditingController();
@@ -22,6 +26,9 @@ class AddPledgeState extends State
 	@override
 	Widget build( BuildContext context )
 	{
+		this.project = ModalRoute.of( context )!.settings.arguments as Project;
+		this.context = context;
+		
 		return Scaffold
 		(
 			appBar: AppBar
@@ -30,12 +37,12 @@ class AddPledgeState extends State
 			),
 			body: Center
 			(
-				child: pledgeFields( context ),
+				child: pledgeFields(),
 			),
 		);
 	}
 	
-	Widget pledgeFields( BuildContext context )
+	Widget pledgeFields()
 	{
 		return Column
 		(
@@ -58,37 +65,28 @@ class AddPledgeState extends State
 	
 	Widget nameField()
 	{
-		return Row
+		return TextField
 		(
-			children: 
-			[
-				Text( 'Name: ' ),
-				Padding( padding: EdgeInsets.only(left: 20) ),
-				SizedBox( child: TextField(controller: _name,), width: 400, ),
-			],
+			controller: _name,
+			decoration: new InputDecoration( labelText: "Pledge Name:" ),
 		);
 	}
 	
 	Widget descriptionField()
 	{
-		return Row
+		return TextField
 		(
-			children: 
-			[
-				Text( 'Description: ' ),
-				Padding( padding: EdgeInsets.only(left: 20) ),
-				SizedBox( child: TextField(controller: _description,), width: 400, ),
-			],
+			controller: _description,
+			decoration: new InputDecoration( labelText: "Pledge Description:" ),
 		);
 	}
 	
 	Widget amountField()
 	{
-		
 		return TextField
 		(
 			controller: _amount,
-			decoration: new InputDecoration( labelText: "Pledge Amount:" ),
+			decoration: new InputDecoration( labelText: "Pledge Amount: \$" ),
 			keyboardType: TextInputType.number,
 			inputFormatters: [ FilteringTextInputFormatter.digitsOnly ],
 		);
@@ -96,19 +94,27 @@ class AddPledgeState extends State
 	
 	Widget pledgedCheckbox()
 	{
-		return Checkbox
+		return CheckboxListTile
 		(
 			value: _pledged,
-			onChanged: (checked) => {_pledged = checked!},
+			onChanged: ( checked ) => 
+			{
+				setState( (){_pledged = checked!;} )
+			},
+			title: Text( "Pledged" ),
 		);
 	}
 	
 	Widget paidCheckbox()
 	{
-		return Checkbox
+		return CheckboxListTile
 		(
 			value: _paid,
-			onChanged: (checked) => {_paid = checked!},
+			onChanged: ( checked ) => 
+			{ 
+				setState( (){_paid = checked!;} )
+			},
+			title: Text( "Paid" ),
 		);
 	}
 	
@@ -119,7 +125,11 @@ class AddPledgeState extends State
 			children: 
 			[
 				Text( 'Add Pledge: ' ),
-				IconButton( onPressed: () {addPledge();}, icon: Icon(Icons.add_task) )
+				IconButton
+				(
+					onPressed: () { addPledge(); },
+					icon: Icon( Icons.add_task )
+				),
 			],
 		);
 	}
@@ -139,5 +149,8 @@ class AddPledgeState extends State
 			paid: _paid,
 		);
 		
+		this.project.addPledge( pledge );
+		
+		Navigator.pop( this.context );
 	}
 }

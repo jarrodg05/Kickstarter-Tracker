@@ -1,5 +1,7 @@
 
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Pledge
 {
 	String name;
@@ -17,54 +19,31 @@ class Pledge
 		required this.paid,
 	});
 	
-	@override
-	String toString()
+	Map<String, dynamic> toMap() =>
 	{
-		String string = "";
-		string += "name:" + this.name + ",";
-		string += "amount:" + this.amount.toString() + ",";
-		string += "description:" + this.description + ",";
-		string += "pledged:" + this.pledged.toString() + ",";
-		string += "paid:" + this.paid.toString() + ",";
-		return string;
-	}
+		'name': name,
+		'amount': amount,
+		'description': description,
+		'pledged' : pledged,
+		'paid': paid,
+	};
 	
-	static Pledge parse( String string )
+	static Pledge fromMap( Map<String, dynamic> json )
 	{
-		String? name;
-		int? amount;
-		String? description;
-		bool? pledged;
-		bool? paid;
-	
-		// TODO this will be problematic if description can have commas
-		List<String> elements = string.split(',');
-		for( String element in elements )
-		{
-			List<String> keyValue = element.split( ":" );
-			if( keyValue[0] == "name" )
-			{
-				name = keyValue[1];
-			}
-			else if( keyValue[0] == "amount" )
-			{
-				amount = int.parse( keyValue[1] );
-			}
-			else if( keyValue[0] == "description" )
-			{
-				description = keyValue[1];
-			}
-			else if( keyValue[0] == "pledged" )
-			{
-				pledged = keyValue[1] == "true";
-			}
-			else if( keyValue[0] == "paid" )
-			{
-				paid = keyValue[1] == "true";
-			}
-		}
+		String name = json['name'];
+		int amount = json['amount'];
+		String description = json['description'];
+		bool pledged = json['pledged'];
+		bool paid = json['paid'];
 		
-		return Pledge( name: name!, amount: amount!, description: description!, pledged: pledged!, paid: paid! );
+		return new Pledge
+		(
+			name: name,
+			amount: amount,
+			description: description,
+			pledged: pledged,
+			paid: paid 
+		);
 	}
 }
 
@@ -79,27 +58,53 @@ class Pledges
 		return pledges.length > 0 ? pledges[0] : null;
 	}
 	
-	@override
-	String toString()
+	void addPledge( Pledge pledge )
 	{
-		String string = "";
-		for( Pledge pledge in this.pledges )
-		{
-			string += pledge.toString();
-			string += ";";
-		}
-		return string;
+		pledges.add( pledge );
 	}
 	
-	static Pledges parse( String string )
+	void removePledge( Pledge pledge )
 	{
-		List<Pledge> pledges = [];
-		List<String> pledgeStrings = string.split(";");
-		for( String pledge in pledgeStrings )
+		pledges.remove( pledge );
+	}
+	
+	void updatePledge( Pledge oldPledge, Pledge newPledge )
+	{
+		int index = pledges.indexOf( oldPledge );
+		pledges.remove( oldPledge );
+		pledges.insert( index, newPledge );
+	}
+	
+	/// retrieve the pledges from the firestore
+	static Pledges getFromFirestore( CollectionReference<Map<String, dynamic>> pledgesCollection )
+	{
+		Pledges pledges = new Pledges( null );
+		pledgesCollection.get().then( (snapshot) 
 		{
-			pledges.add( Pledge.parse(pledge) );
-		}
+			List<QueryDocumentSnapshot<Map<String, dynamic>>> docs = snapshot.docs;
+			for( QueryDocumentSnapshot<Map<String, dynamic>> doc in docs )
+			{
+				pledges.addPledge( Pledge.fromMap(doc.data()) );
+			}
+		});
 		
-		return Pledges( pledges );
+		return pledges;
+	}
+	
+	/// adds the pledges to the firestore
+	void addToFirestore( CollectionReference<Map<String, dynamic>> pledgesCollection )
+	{
+		for( Pledge pledge in this.pledges )
+		{
+			// add the pledge if not in the firestore
+			Query<dynamic> result = pledgesCollection.where( pledge.name );
+			result.get().then( (snapshot) => 
+			{
+				if( snapshot.docs.isEmpty )
+				{
+					pledgesCollection.add( pledge.toMap() )
+				}
+			} );
+		}
 	}
 }

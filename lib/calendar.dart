@@ -173,7 +173,7 @@ class CalendarPage extends State<Calendar>
 	CalendarPage()
 	{
 		instance = this;
-		projectList = projectListView();
+		// projectList = projectListView();
 	}
 	
 	Widget calendarPage()
@@ -192,7 +192,7 @@ class CalendarPage extends State<Calendar>
 	
 	Widget build( BuildContext context )
 	{
-		ProjectsDatabase.database.checkProjects( reload );
+		loading = ! ProjectsDatabase.database.checkProjects( reload );
 
 		if( loading )
 		{

@@ -155,6 +155,7 @@ class _AddProjectScreenState extends State<AddProjectScreen>
 			date: date,
 			link: link,
 			status: ProjectStatus.Campaign,
+			id: "",
 		);
 		
 		ProjectsDatabase.database.addProject( project );
