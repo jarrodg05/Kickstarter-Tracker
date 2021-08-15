@@ -10,16 +10,25 @@ trawling through project pages, but this project aims to condense and consolidat
 easy to find consistent locations, and provide views showing all your backed/followed projects.
 
 ## Where is it at?
-Updated 2021-July-03 (init commit)
+Updated 2021-August-15 (SHA 2ela89f6)
 
-Not yet usable in any meaningful way. Projects (very limited) can be added and seen in release order,
-but nothing is saved. and everything not saved will be lost. Naturally next step is to add some permenance,
-and get communication with a database sorted out.
+Projects can be added and saved to a backing google firestore. The projects are viewable in an
+ordered list on the main page. Clicking on a project will open a page with more info about
+that project. Currently the project is unable to be edited, but pledges can be added to the
+project. 
 
 ## THE PLAN
 <ol>
-  <li> Projects can be added to calendar view </li>
-  <li> Plan is a bit of exageration - fill out the plan </li>
+  <li> <s> Projects can be added to calendar view </s> </li>
+  <li> <s> Plan is a bit of exageration - fill out the plan</s> </li>
+  <li> <s> Pledges can be added to a project </s> </li>
+  <li> Add a navigation bar at bottom(?) of each page </li>
+  <li> Enable editing of projects </li>
+  <li> Enable editing of pledges </li>
+  <li> Pretty things up a bit </li>
+  <li> Add some views for pledge information - e.g. total not paid </li>
+  <li> Custom date picker for adding projects - just want to pick months not days </li>
+  <li> More info for projects & pledges </li>
 </ol>
 
 ## On the off chance you are reading this ...
