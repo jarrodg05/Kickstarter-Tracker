@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:kickstarter/addPledge.dart';
+import 'package:kickstarter/homeView.dart';
 import 'package:kickstarter/showMore.dart';
 import 'calendar.dart';
 import 'addProject.dart';
@@ -28,10 +29,11 @@ class MyApp extends StatelessWidget {
 				primarySwatch: Colors.blue,
 			),
 			// home: MyHomePage(title: 'Flutter Demo Home Page'),
-			initialRoute: '/calendar',
+			initialRoute: '/homePage',
 			
 			routes:
 			{
+				'/homePage': (context) => HomeView(),
 				'/calendar': (context) => Calendar(),
 				'/addProject': (context) => AddProjectScreen(),
 				'/showMore': (context) => ShowMoreScreen(),
