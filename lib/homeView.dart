@@ -1,8 +1,7 @@
 
 
 import 'package:flutter/material.dart';
-import 'package:kickstarter/addProject.dart';
-import 'package:kickstarter/calendar.dart';
+import 'calendarTab.dart';
 
 class HomeView extends StatefulWidget
 {
@@ -14,7 +13,8 @@ class HomeView extends StatefulWidget
 class _HomeViewState extends State<HomeView>
 {	
 	int _selectedIndex = 0;
-	Calendar _calendarPage = new Calendar();
+	CalendarTab _calendarTab = new CalendarTab();
+	
 	
 	@override
 	Widget build( BuildContext context )
@@ -27,9 +27,10 @@ class _HomeViewState extends State<HomeView>
 				children: 
 				[
 					Text('Home'),
-					_calendarPage,
+					_calendarTab,
 				],
 			),
+
 			bottomNavigationBar: BottomNavigationBar
 			(
 				items: 
@@ -55,23 +56,11 @@ class _HomeViewState extends State<HomeView>
 	{
 		setState( ()
 		{
+			if( _selectedIndex == index && index == 1 )
+			{
+				_calendarTab.goToHome();
+			}
 			_selectedIndex = index;
 		});
 	}
-	
-	// Widget _pages( int index )
-	// {
-	// 	if( index == 0 )
-	// 	{
-	// 		return Text( "Home" );
-	// 	}
-	// 	else if( index == 1 )
-	// 	{
-	// 		return _calendarPage;
-	// 	}
-	// 	else
-	// 	{
-	// 		return new AddProjectScreen();
-	// 	}
-	// }
 }

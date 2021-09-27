@@ -125,6 +125,16 @@ class _ProjectDescription extends StatelessWidget
 	}
 }
 
+ListView projectListView()
+{
+	List<ProjectListItem> projects =  getProjects();
+	return ListView.builder
+	(
+		itemCount: projects.length,
+		itemBuilder: ( BuildContext context, int index) { return projects[index]; },
+	);
+}
+
 List<ProjectListItem> getProjects()
 {
 	List<Project> projects = ProjectsDatabase.database.getProjects();
@@ -143,43 +153,12 @@ List<ProjectListItem> getProjects()
 	return projectsList;
 }
 
-Widget titleBar( BuildContext context )
-{
-	return Row
-	(
-		children: [
-			Material(
-				child: IconButton
-				(
-					onPressed: ()
-					{
-						CalendarPage.instance.addProject( context );
-					},
-					icon: Icon( Icons.add_circle ),
-				),
-			),
-		],
-		mainAxisAlignment: MainAxisAlignment.end,
-	);
-}
-
 class CalendarPage extends State<Calendar>
 {
-	late Widget _calendar;
-	static late final CalendarPage instance;
-	late ListView projectList;
+	ListView projectList;
 	bool loading = true;
 	
-	CalendarPage()
-	{
-		instance = this;
-		// projectList = projectListView();
-	}
-	
-	Widget calendarPage()
-	{
-		return _calendar;
-	}
+	CalendarPage() : this.projectList = projectListView();
 	
 	void reload()
 	{
@@ -214,17 +193,6 @@ class CalendarPage extends State<Calendar>
 		);
 	}
 	
-	ListView projectListView()
-	{
-		List<ProjectListItem> projects =  getProjects();
-		return ListView.builder
-		(
-			itemCount: projects.length,
-			itemBuilder: ( BuildContext context, int index) { return projects[index]; },
-		);
-	}
-	
-	
 	void addProject( BuildContext context ) async
 	{
 		await Navigator.pushNamed( context, '/addProject' );
@@ -233,6 +201,26 @@ class CalendarPage extends State<Calendar>
 		{
 			projectList = projectListView();
 		});
+	}
+	
+	Widget titleBar( BuildContext context )
+	{
+		return Row
+		(
+			children: [
+				Material(
+					child: IconButton
+					(
+						onPressed: ()
+						{
+							addProject( context );
+						},
+						icon: Icon( Icons.add_circle ),
+					),
+				),
+			],
+			mainAxisAlignment: MainAxisAlignment.end,
+		);
 	}
 }
 
