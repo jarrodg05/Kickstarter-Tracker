@@ -5,21 +5,11 @@ import 'date.dart';
 class AddProjectScreen extends StatefulWidget
 {
 	@override
-	_AddProjectScreenState createState() => _AddProjectScreenState();
+	_AddProjectState createState() => _AddProjectState();	
 }
 
-
-class _AddProjectScreenState extends State<AddProjectScreen>
+class _AddProjectState extends _ProjectFieldsState
 {
-	TextEditingController _name = TextEditingController();
-	TextEditingController _publisher = TextEditingController();
-	TextEditingController _link = TextEditingController();
-	DateTime? _date;
-	
-	DateTime _currentDate = DateTime( DateTime.now().year, DateTime.now().month );
-	
-	Text _dateText = Text( "Pick Date" );
-	
 	@override
 	Widget build( BuildContext context )
 	{
@@ -31,117 +21,29 @@ class _AddProjectScreenState extends State<AddProjectScreen>
 			),
 			body: Center
 			(
-				child: projectFields( context ),
+				child: projectFields( context, _confirmWidget() ),
 			),
 		);
 	}
-
-	Widget projectFields( BuildContext context )
-	{
-		return Column
-		(
-			children:
-			[
-				nameField(),
-				Padding( padding: EdgeInsets.symmetric(vertical: 10) ),
-				publisherField(),
-				Padding( padding: EdgeInsets.symmetric(vertical: 10) ),
-				linkField(),
-				Padding( padding: EdgeInsets.symmetric(vertical: 10) ),
-				dateField(),
-				Padding( padding: EdgeInsets.symmetric(vertical: 10) ),
-				confirmField(),
-			],
-		);
-	}
 	
-	Widget nameField()
-	{
-		return Row
-		(
-			children: 
-			[
-				Text( 'Name: ' ),
-				Padding( padding: EdgeInsets.only(left: 20) ),
-				SizedBox( child: TextField(controller: _name,), width: 400, ),
-			],
-		);
-	}
-	
-	Widget publisherField()
-	{
-		return Row
-		(
-			children: 
-			[
-				Text( 'Publisher: ' ),
-				Padding( padding: EdgeInsets.only(left: 20) ),
-				SizedBox( child: TextField(controller: _publisher,), width: 400, ),
-			],
-		);
-	}
-		
-	Widget linkField()
-	{
-		return Row
-		(
-			children: 
-			[
-				Text( 'Link: ' ),
-				Padding( padding: EdgeInsets.only(left: 20) ),
-				SizedBox( child: TextField(controller: _link,), width: 400, ),
-			],
-		);
-	}
-	
-	Widget dateField()
-	{
-		return Row
-		(
-			children: 
-			[
-				Text( 'Arrival Date: ' ),
-				TextButton( onPressed: () {selectDate(context);}, child: _dateText ),
-			],
-		);
-	}
-	
-	Widget confirmField()
+	Widget _confirmWidget()
 	{
 		return Row
 		(
 			children: 
 			[
 				Text( 'Add to Tracker: ' ),
-				IconButton( onPressed: () {addProject();}, icon: Icon(Icons.add_task) )
+				IconButton( onPressed: () {_addProject();}, icon: Icon(Icons.add_task) )
 			],
 		);
 	}
 	
-	selectDate( BuildContext context ) async
+	void _addProject()
 	{
-		_date = await showDatePicker
-		(
-			context: context,
-			initialDate: _currentDate,
-			firstDate: _currentDate,
-			lastDate: _currentDate.add( Duration(days: 5*365) ),
-			initialDatePickerMode: DatePickerMode.year,
-		);
-		
-		String dateString = prettyPrint( _date! );
-		_dateText = Text( dateString );
-		setState(() {
-			return;
-		});
-	}
-	
-	addProject()
-	{
-		String name = _name.text;
-		String publisher = _publisher.text;
-		String link = _link.text;
-		DateTime date = _date!;
+		String name = super.name.text;
+		String publisher = super.publisher.text;
+		String link = super.link.text;
+		DateTime date = super.date!;
 		
 		Widget image = Container( decoration: const BoxDecoration(color: Colors.blue) );
 		
@@ -160,7 +62,186 @@ class _AddProjectScreenState extends State<AddProjectScreen>
 		
 		ProjectsDatabase.database.addProject( project );
 		
-		
 		Navigator.pop( context );
+	}
+}
+
+class EditProjectScreen extends StatefulWidget
+{
+	EditProjectScreen();
+	
+	@override
+	_EditProjectState createState() => _EditProjectState();
+}
+
+class _EditProjectState extends _ProjectFieldsState
+{
+	late Project project;
+	
+	_EditProjectState() : super();
+	
+	@override
+	Widget build( BuildContext context )
+	{
+		return Scaffold
+		(
+			appBar: AppBar
+			(
+				title: Text( 'Edit Project' ),
+			),
+			body: Center
+			(
+				child: projectFields( context, _confirmWidget() ),
+			),
+		);
+	}
+	
+	@override
+	void didChangeDependencies()
+	{
+		this.project = ModalRoute.of( context )!.settings.arguments as Project;
+		super.didChangeDependencies();
+		
+		fillFields( project );
+	}
+	
+	Widget _confirmWidget()
+	{
+		return Row
+		(
+			children: 
+			[
+				Text( 'Save Changes: ' ),
+				IconButton( onPressed: () {_editProject();}, icon: Icon(Icons.add_task) )
+			],
+		);
+	}
+	
+	void _editProject()
+	{
+		String name = this.name.text;
+		String publisher = this.publisher.text;
+		String link = this.link.text;
+		DateTime date = this.date!;
+		
+		// TODO add validation of inputs beofer here
+		
+		this.project.name = name;
+		this.project.publisher = publisher;
+		this.project.date = date;
+		this.project.link = link;
+		
+		ProjectsDatabase.database.updateProject( this.project.toMap(), this.project.id );
+		Navigator.pop( context, this.project );
+	}
+}
+
+abstract class _ProjectFieldsState extends State
+{
+	TextEditingController name = TextEditingController();
+	TextEditingController publisher = TextEditingController();
+	TextEditingController link = TextEditingController();
+	DateTime? date;
+	
+	DateTime currentDate = DateTime( DateTime.now().year, DateTime.now().month );
+	
+	Text dateText = Text( "Pick Date" );
+	
+	_ProjectFieldsState();
+	
+	void fillFields( Project project )
+	{
+		name.text = project.name;
+		publisher.text = project.publisher;
+		link.text = project.link;
+		date = project.date;
+	}
+
+	Widget projectFields( BuildContext context, Widget confirmWidget )
+	{
+		return Column
+		(
+			children:
+			[
+				nameField(),
+				Padding( padding: EdgeInsets.symmetric(vertical: 10) ),
+				publisherField(),
+				Padding( padding: EdgeInsets.symmetric(vertical: 10) ),
+				linkField(),
+				Padding( padding: EdgeInsets.symmetric(vertical: 10) ),
+				dateField(),
+				Padding( padding: EdgeInsets.symmetric(vertical: 10) ),
+				confirmWidget,
+			],
+		);
+	}
+	
+	Widget nameField()
+	{
+		return Row
+		(
+			children: 
+			[
+				Text( 'Name: ' ),
+				Padding( padding: EdgeInsets.only(left: 20) ),
+				SizedBox( child: TextField(controller: name,), width: 400, ),
+			],
+		);
+	}
+	
+	Widget publisherField()
+	{
+		return Row
+		(
+			children: 
+			[
+				Text( 'Publisher: ' ),
+				Padding( padding: EdgeInsets.only(left: 20) ),
+				SizedBox( child: TextField(controller: publisher,), width: 400, ),
+			],
+		);
+	}
+		
+	Widget linkField()
+	{
+		return Row
+		(
+			children: 
+			[
+				Text( 'Link: ' ),
+				Padding( padding: EdgeInsets.only(left: 20) ),
+				SizedBox( child: TextField(controller: link,), width: 400, ),
+			],
+		);
+	}
+	
+	Widget dateField()
+	{
+		return Row
+		(
+			children: 
+			[
+				Text( 'Arrival Date: ' ),
+				TextButton( onPressed: () {selectDate(context);}, child: dateText ),
+			],
+		);
+	}
+	
+	selectDate( BuildContext context ) async
+	{
+		this.date = await showDatePicker
+		(
+			context: context,
+			initialDate: currentDate,
+			firstDate: currentDate,
+			lastDate: currentDate.add( Duration(days: 5*365) ),
+			initialDatePickerMode: DatePickerMode.year,
+		);
+		
+		String dateString = prettyPrint( date! );
+		dateText = Text( dateString );
+		setState(() {
+			return;
+		});
 	}
 }

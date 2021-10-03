@@ -37,7 +37,7 @@ class ProjectListItem extends StatelessWidget
 						flex: 3,
 					),
 					const Icon(
-						Icons.more_vert,
+						Icons.more_horiz,
 						size: 16.0
 					),
 				],
@@ -56,6 +56,12 @@ class ProjectListItem extends StatelessWidget
 	showMore( Project project, BuildContext context ) async
 	{
 		await Navigator.pushNamed( context, '/showMore', arguments: project );
+		CalendarPage? page = context.findAncestorStateOfType();
+		if( page != null )
+		{
+			page.reload();
+		}
+		
 	}
 }
 
@@ -207,8 +213,10 @@ class CalendarPage extends State<Calendar>
 	{
 		return Row
 		(
-			children: [
-				Material(
+			children: 
+			[
+				Material
+				(
 					child: IconButton
 					(
 						onPressed: ()
@@ -216,7 +224,9 @@ class CalendarPage extends State<Calendar>
 							addProject( context );
 						},
 						icon: Icon( Icons.add_circle ),
+						color: Colors.white,
 					),
+					color: Colors.green,
 				),
 			],
 			mainAxisAlignment: MainAxisAlignment.end,

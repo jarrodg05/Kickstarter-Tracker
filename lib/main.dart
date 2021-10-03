@@ -21,6 +21,7 @@ class MyApp extends StatelessWidget {
 			{
 				'/homePage': (context) => HomeView(),
 			},
+			debugShowCheckedModeBanner: false,
 		);
 	}
 }
@@ -71,6 +72,7 @@ class _MyHomePageState extends State<MyHomePage>
 		if( _error )
 		{
 			// return error screen
+			return Text( "Error connecting, check internet connection!" );
 		}
 		
 		if( !_initialized )

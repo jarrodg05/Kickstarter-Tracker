@@ -26,37 +26,40 @@ class CalendarTab extends StatefulWidget
 	}
 }
 
+// need this to be able to push routes from here down onto navigator
+final GlobalKey<NavigatorState> navKey = GlobalKey();
+
 class _CalendarTabState extends State<CalendarTab>
-{
-	late BuildContext navContext;
-	Calendar calendarPage = Calendar();
-	
+{	
 	@override
 	Widget build( BuildContext context )
 	{
 		return Navigator
 		(
+			key: navKey,
 			onGenerateRoute: ( RouteSettings settings )
 			{
+				WidgetBuilder builder = ( BuildContext navContext )
+				{
+					switch( settings.name)
+					{
+						case '/addProject':
+							return AddProjectScreen();
+						case '/showMore':
+							return ShowMoreScreen();
+						case '/editProject':
+							return EditProjectScreen();
+						case '/addPledge':
+							return AddPledgeScreen();
+						case '/calendar':
+						default:
+							return Calendar();
+					}
+				};
 				return MaterialPageRoute
 				(
 					settings: settings,
-					builder: ( BuildContext navContext )
-					{
-						this.navContext = navContext;
-						switch( settings.name)
-						{
-							case '/addProject':
-								return AddProjectScreen();
-							case '/showMore':
-								return ShowMoreScreen();
-							case '/addPledge':
-								return AddPledgeScreen();
-							case '/calendar':
-							default:
-								return calendarPage;
-						}
-					}
+					builder: builder,
 				);
 			},
 		);
@@ -67,6 +70,6 @@ class _CalendarTabState extends State<CalendarTab>
 	///
 	void goToHome()
 	{
-		Navigator.pushNamed( navContext, '/calendar' );
+		navKey.currentState!.pushNamed( '/calendar' );
 	}
 }

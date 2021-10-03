@@ -143,13 +143,21 @@ class ProjectsDatabase
 		loadProjects( null );
 	}
 	
-	// void updateProject( Map<String, Object> updates, String projectId ) async
-	// {
-	// 	upToDate = false;
+	void updateProject( Map<String, dynamic> updates, String projectId ) async
+	{
+		upToDate = false;
 		
-	// 	await _projectFirebase.doc( projectId ).update( updates );
-	// 	loadProjects( null );
-	// }
+		await _projectFirebase.doc( projectId ).update( updates );
+		loadProjects( null );
+	}
+	
+	void deleteProject( String projectId ) async
+	{
+		upToDate = false;
+		
+		await _projectFirebase.doc( projectId ).delete();
+		loadProjects( null );
+	}
 	
 	/// updates a pledge on a particular project
 	void updatePledges( Pledge pledge, String projectId, bool newPledge )

@@ -99,29 +99,54 @@ class ShowMoreState extends State
 	{
 		return AppBar
 		(
-			// preferredSize: Size.fromHeight( 30 ),
-			leading: Row
-			(
-				children: 
-				[
-					Text( project.name ),
-					Padding( padding: EdgeInsetsDirectional.only(start:20) ),
-					Material(
+			leading: Material
+					(
 						child: IconButton
 						(
 							onPressed: ()
 							{
-								Navigator.pushNamed( context, '/editProject' );
+								editProject();
 							},
 							icon: Icon( Icons.edit ),
 						),
+						color: Colors.green,
 					),
-				],
-				mainAxisAlignment: MainAxisAlignment.start,
-				mainAxisSize: MainAxisSize.max,
-			),
-			leadingWidth: 200,
+			title: Text( project.name ),
+			actions: 
+			[
+				Material
+				(
+					child: IconButton
+					(
+						onPressed: ()
+						{
+							deleteProject();
+						},
+						icon: Icon( Icons.delete_forever ),
+						color: Colors.white,
+					),
+					color: Colors.red,
+				)
+			],
+			centerTitle: true,
 		);
 	}
-		
+	
+	void editProject() async
+	{
+		final result = await Navigator.pushNamed( context, '/editProject', arguments: this.project );
+		if( result != null )
+		{
+			setState( () 
+			{
+				this.project = result as Project;
+			});
+		}
+	}
+	
+	void deleteProject()
+	{
+		ProjectsDatabase.database.deleteProject( this.project.id );
+		Navigator.pop( context );
+	}
 }
