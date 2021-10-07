@@ -22,8 +22,8 @@ project.
   <li> <s> Projects can be added to calendar view </s> </li>
   <li> <s> Plan is a bit of exageration - fill out the plan</s> </li>
   <li> <s> Pledges can be added to a project </s> </li>
-  <li> Add a navigation bar at bottom(?) of each page </li>
-  <li> Enable editing of projects </li>
+  <li> <s> Add a navigation bar at bottom(?) of each page </s> </li>
+  <li> <s> Enable editing of projects </s> </li>
   <li> Enable editing of pledges </li>
   <li> Pretty things up a bit </li>
   <li> Add some views for pledge information - e.g. total not paid </li>

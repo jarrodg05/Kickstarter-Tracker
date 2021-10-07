@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_web_browser/flutter_web_browser.dart';
 import 'package:kickstarter/projects.dart';
 
+import 'package:http/http.dart' as http;
+import 'package:kickstarter/swapImage.dart';
+import 'package:transparent_image/transparent_image.dart';
 import 'projects.dart';
 import 'date.dart';
 
@@ -25,7 +28,7 @@ class ProjectListItem extends StatelessWidget
 				crossAxisAlignment: CrossAxisAlignment.start,
 				children: <Widget>[
 					Expanded(
-						child: project.image,
+						child: projectImage(),
 						flex: 2
 					),
 					Expanded(
@@ -61,7 +64,51 @@ class ProjectListItem extends StatelessWidget
 		{
 			page.reload();
 		}
+	}
+	
+	Widget projectImage()
+	{
+		if( this.project.link != "" )
+		{
+			// FadeInImage image = FadeInImage.memoryNetwork( placeholder: kTransparentImage, image: 'https://ksr-static.imgix.net/tq0sfld-kickstarter-logo-green.png?ixlib=rb-2.1.0&s=0cce952d7b55823ff451a58887a0c578' );
+			// getImageUrl( this.project.link ).then( (imageUrl) => 
+			// {
+			// 	// if( imageUrl != null )
+			// 	// {
+			// 		image = FadeInImage.memoryNetwork( placeholder: kTransparentImage, image: imageUrl! )
+			// 	// }
+			// } );
+			return SwapImage( getImageUrl(this.project.link) );
+			// return image;
+		}
+		else
+		{
+			return this.project.image;
+		}
+	}
+	
+	Future<String?> getImageUrl( String projectUrl ) async 
+	{
+		// Download the content of the site
+		Uri uri = Uri.parse( projectUrl );
+		http.Response response = await http.get( uri, headers: { "Access-Control-Allow-Origin": "*" } );
+		String html = response.body;
 		
+		// The html contains the following string exactly one time.
+		// After this specific string the url of the profile picture starts. 
+		String needle = '<meta name="image" property="og:image" content="';
+		int index = html.indexOf(needle);
+		
+		// The result of indexOf() equals -1 if the needle didn't occurred in the html.
+		// In that case the received username may be invalid.
+		if (index == -1)
+			return null;
+		
+		// Remove all characters up to the start of the text snippet that we want.
+		html = html.substring(html.indexOf(needle) + needle.length);
+		
+		// return all chars until the first occurrence of '"'
+		return html.substring(0, html.indexOf('"'));
 	}
 }
 
